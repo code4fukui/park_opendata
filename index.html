@@ -7,7 +7,7 @@
 <div id=divselect>
 </div>
 <hr>
-Illust by DALL·E (<a href=https://openai.com/>OpenAI</a>)<br>
+illustration by DALL·E (<a href=https://openai.com/>OpenAI</a>)<br>
 <a href=https://github.com/code4fukui/park_opendata>src on GitHub</a><br>
 </p><p>
 <script type="module" src="https://js.sabae.cc/QRCode.js"></script>
@@ -26,21 +26,28 @@ const addImageLink = (icon, f) => {
   const img = new Image();
   img.src = icon.image;
   div.appendChild(img);
-  const div2 = document.createElement("div");
+  const div2 = document.createElement("span");
   div2.textContent = icon.name;
   div.appendChild(div2);
   divselect.appendChild(div);
-  img.onclick = f;
+  img.onclick = () => {
+    for (const c of divselect.children) {
+      c.classList.remove("selected");
+    }
+    div.classList.add("selected");
+    f();
+  };
+  return div;
 };
 
-addImageLink({ image: "img/park.jpg", name: "全公園" }, () => {
+const div = addImageLink({ image: "img/park.jpg", name: "全公園" }, () => {
   map.value = data2;
 });
+div.classList.add("selected");
 
 data.forEach(i => {
   addImageLink(i, () => {
-    const data3 = data2.filter(j => j.主な遊具.indexOf(i.name) >= 0);
-    map.value = data3;
+    map.value = data2.filter(j => j.主な遊具.indexOf(i.name) >= 0);
   })
 });
 
@@ -51,16 +58,19 @@ data.forEach(i => {
   overflow: scroll;
   white-space: nowrap;
 }
-#divselect div {
+#divselect > div {
   vertical-align: top;
   display: inline-block;
-  margin-right: .3em;
-  width: 15.3vw;
+  text-align: center;
+}
+#divselect > div > span, #divselect img {
+  display: block;
+  padding: 0.4em;
+  width: 15vw;
   white-space: normal;
 }
-#divselect img {
-  display: block;
-  width: 15vw;
+#divselect .selected {
+  background-color: #ffbbcc;
 }
 h2 {
   padding: 0;
