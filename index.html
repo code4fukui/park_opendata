@@ -1,8 +1,70 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
 <script type="module" src="https://js.sabae.cc/csv-map.js"></script>
-<h2>杉並区＆中野区</h2>
+<h1>杉並区＆中野区 公園オープンデータマップ</h1>
 <csv-map src="park.csv" id=map></csv-map>
+
+<h2>遊具から絞り込む</h2>
+<div id=divselect>
+</div>
+<hr>
+Illust by DALL·E (<a href=https://openai.com/>OpenAI</a>)<br>
+<a href=https://github.com/code4fukui/park_opendata>src on GitHub</a><br>
+
+
+<script type="module">
+import { CSV } from "https://js.sabae.cc/CSV.js";
+
+const data2 = await CSV.fetchJSON("park.csv");
+
+const data = await CSV.fetchJSON("equipment.csv");
+
+const addImageLink = (icon, f) => {
+  const div = document.createElement("div");
+  const img = new Image();
+  img.src = icon.image;
+  div.appendChild(img);
+  const div2 = document.createElement("div");
+  div2.textContent = icon.name;
+  div.appendChild(div2);
+  divselect.appendChild(div);
+  img.onclick = f;
+};
+
+addImageLink({ image: "img/park.jpg", name: "全公園" }, () => {
+  map.value = data2;
+});
+
+data.forEach(i => {
+  addImageLink(i, () => {
+    const data3 = data2.filter(j => j.主な遊具.indexOf(i.name) >= 0);
+    map.value = data3;
+  })
+});
+
+</script>
+
+<style>
+#divselect {
+  overflow: scroll;
+  white-space: nowrap;
+}
+#divselect div {
+  display: inline-block;
+  margin-right: .3em;
+}
+#divselect img {
+  display: block;
+  width: 15vw;
+}
+h2 {
+  padding: 0;
+  margin: 0;
+}
+</style>
+
+<!--
 <h2>中野区</h2>
 <csv-map src="park_nakanoku.csv" id=map></csv-map>
 <h2>杉並区</h2>
 <csv-map src="park_suginamiku.csv" id=map></csv-map>
+-->

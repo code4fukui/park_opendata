@@ -1,4 +1,6 @@
 import { CSV } from "https://js.sabae.cc/CSV.js";
+import { ArrayUtil } from "https://js.sabae.cc/ArrayUtil.js";
+import { HankakuKana } from "https://code4fukui.github.io/mojikiban/HankakuKana.js";
 
 const data1 = await CSV.fetchJSON("org/park_nakanoku.csv");
 const data2 = await CSV.fetchJSON("org/park_suginamiku_scraped.csv");
@@ -100,6 +102,22 @@ for (const d of data1) {
 for (const d of data2) {
   data.push(remap("杉並区", "green", d));
 }
+
+const getUnique = (data, name) => {
+  const equip = [];
+  data.forEach(i => {
+    if (!i[name]) return;
+    const ss = i[name].split("、");
+    const ss2 = ss.map(i => HankakuKana.toZen(i)).map(i => i == "クライミンング遊具他遊具" ? "クライミンング遊具" : i);
+    i[name] = ss2.join(";");
+    ss2.forEach(i => equip.push(i));
+  });
+  return ArrayUtil.toUnique(equip);
+};
+const faci = getUnique(data, "主な施設");
+const equip = getUnique(data, "主な遊具");
+console.log(faci, equip)
+
 await Deno.writeTextFile("park.csv", CSV.stringify(data));
 await Deno.writeTextFile("park_nakanoku.csv", CSV.stringify(data.filter(i => i.owner == "中野区")));
 await Deno.writeTextFile("park_suginamiku.csv", CSV.stringify(data.filter(i => i.owner == "杉並区")));
